@@ -2,6 +2,7 @@ import '../../constants.dart';
 import 'package:flutter/material.dart';
 
 import 'budget_page.dart';
+import 'daily_transactions.dart';
 import 'profile_page.dart';
 import 'stats_page.dart';
 
