@@ -36,7 +36,7 @@ dependencies:
   riverpod: ^1.0.3
   flutter_svg: ^1.0.3
   syncfusion_flutter_charts: ^19.4.52
-
+  dio: ^4.0.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
