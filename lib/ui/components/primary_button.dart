@@ -1,4 +1,4 @@
-import '../../constants.dart';
+import '../../utils/constants.dart';
 import 'package:flutter/material.dart';
 
 class PrimaryButton extends StatelessWidget {
@@ -26,7 +26,7 @@ class PrimaryButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(14.0),
           ),
         ),
-        onPressed: () {},
+        onPressed: onPress,
         child: Text(
           title,
           style: const TextStyle(

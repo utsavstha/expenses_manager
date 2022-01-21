@@ -37,6 +37,9 @@ dependencies:
   flutter_svg: ^1.0.3
   syncfusion_flutter_charts: ^19.4.52
   dio: ^4.0.4
+  result_type: ^0.1.0
+  flutter_riverpod: ^1.0.3
+  form_field_validator: ^1.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

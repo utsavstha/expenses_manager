@@ -2,7 +2,7 @@ import '../components/toolbar_component.dart';
 import '../components/transaction_list_component.dart';
 import 'package:flutter/material.dart';
 
-import '../../constants.dart';
+import '../../utils/constants.dart';
 
 class DailyTransaction extends StatefulWidget {
   const DailyTransaction({Key? key}) : super(key: key);

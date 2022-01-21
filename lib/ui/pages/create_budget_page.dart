@@ -2,7 +2,7 @@ import '../../ui/components/primary_button.dart';
 import '../../ui/components/toolbar_with_back_component.dart';
 import 'package:flutter/material.dart';
 
-import '../../constants.dart';
+import '../../utils/constants.dart';
 
 class CreateBudgetPage extends StatefulWidget {
   const CreateBudgetPage({Key? key}) : super(key: key);

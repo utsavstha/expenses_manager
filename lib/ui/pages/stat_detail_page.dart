@@ -1,4 +1,4 @@
-import '../../constants.dart';
+import '../../utils/constants.dart';
 import '../../ui/components/toolbar_with_back_component.dart';
 import '../../ui/components/transaction_list_component.dart';
 import 'package:flutter/material.dart';

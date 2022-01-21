@@ -1,4 +1,4 @@
-import '../../constants.dart';
+import '../../utils/constants.dart';
 import 'package:flutter/material.dart';
 
 import 'budget_page.dart';
@@ -29,7 +29,7 @@ class DashboardPage extends StatelessWidget {
         ), //icon inside button
       ),
       body: SafeArea(
-        child: _widgetOptions.elementAt(4),
+        child: _widgetOptions.elementAt(0),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../constants.dart';
+import '../../utils/constants.dart';
 
 class TransactionListComponent extends StatefulWidget {
   const TransactionListComponent({Key? key}) : super(key: key);

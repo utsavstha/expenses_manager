@@ -1,4 +1,4 @@
-import '../../constants.dart';
+import '../../utils/constants.dart';
 import '../../ui/components/dashed_seperator.dart';
 import '../../ui/components/primary_button.dart';
 import 'package:flutter/material.dart';
