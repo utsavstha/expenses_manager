@@ -28,7 +28,10 @@ class HttpRequest {
   Future<dynamic> post(url, Map param) async {
     Response response;
     try {
+      print(param);
+      print(url);
       response = await dio.post(url, data: param);
+      print(response.data);
     } on SocketException {
       throw FetchDataException('No Internet connection');
     }
@@ -39,6 +42,8 @@ class HttpRequest {
     switch (response.statusCode) {
       case 200:
         return response.data;
+      case 201:
+        return response.data;
       case 400:
         throw BadRequestException(response.data);
       case 401:
@@ -46,6 +51,7 @@ class HttpRequest {
         throw UnauthorisedException(response.data);
       case 500:
       default:
+        print(response.data);
         throw FetchDataException(
             'Error occured while Communication with Server with StatusCode: ${response.statusCode}');
     }

@@ -12,7 +12,7 @@ class AddTransactionPage extends StatefulWidget {
 }
 
 class _AddTransactionPageState extends State<AddTransactionPage> {
-  int _currentStep = 0;
+  double _currentStep = 0.5;
   PageController controller = PageController();
   @override
   Widget build(BuildContext context) {
@@ -33,15 +33,18 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.close,
+                IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.close),
                 ),
                 const SizedBox(
                   width: 10,
                 ),
-                Text(
+                const Text(
                   'Add transaction',
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontFamily: 'GTWalsheimPro',
                       fontSize: 20,
                       fontWeight: FontWeight.w700),
@@ -49,11 +52,11 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               ],
             ),
           ),
-          LinearProgressIndicator(color: primaryColor, value: 0.5),
+          LinearProgressIndicator(color: primaryColor, value: _currentStep),
           Expanded(
               child: PageView(
             controller: controller,
-            children: [StepTwo(), StepOne()],
+            children: [StepOne(), StepTwo()],
           )),
         ],
       ),
@@ -104,10 +107,10 @@ class StepOne extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            padding: EdgeInsets.all(3.0),
-                            decoration: BoxDecoration(
+                            padding: const EdgeInsets.all(3.0),
+                            decoration: const BoxDecoration(
                                 color: secondaryColor, shape: BoxShape.circle),
-                            child: Icon(
+                            child: const Icon(
                               Icons.keyboard_arrow_left_rounded,
                               color: Colors.white,
                               size: 40,
@@ -116,7 +119,7 @@ class StepOne extends StatelessWidget {
                           const SizedBox(
                             height: 40,
                           ),
-                          Text(
+                          const Text(
                             'Income',
                             style: TextStyle(
                                 fontFamily: 'GTWalsheimPro',

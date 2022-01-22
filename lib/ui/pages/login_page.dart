@@ -1,5 +1,7 @@
 import 'package:expense_manager/controller/login_controller.dart';
+import 'package:expense_manager/model/login_model.dart';
 import 'package:expense_manager/routes/app_pages.dart';
+import 'package:expense_manager/utils/save_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 
@@ -50,6 +52,16 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    SaveData.getToken().then((value) {
+      if (value.isNotEmpty) {
+        Navigator.pushNamed(context, Routes.home);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
@@ -59,6 +71,8 @@ class _LoginPageState extends State<LoginPage> {
             final provider = ref.watch(loginProvider);
 
             if (provider.apiResponse.model != null) {
+              SaveData.saveData(
+                  (provider.apiResponse.model as LoginModel).token);
               WidgetsBinding.instance!.addPostFrameCallback((_) {
                 Navigator.pushNamed(context, Routes.home);
               });
