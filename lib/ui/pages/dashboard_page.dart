@@ -89,7 +89,7 @@ class DashboardPage extends ConsumerWidget {
             ),
             IconButton(
               icon: Icon(
-                Icons.search,
+                Icons.stacked_bar_chart,
                 color: Colors.grey.shade500,
               ),
               onPressed: () {
@@ -105,7 +105,7 @@ class DashboardPage extends ConsumerWidget {
             ),
             IconButton(
               icon: Icon(
-                Icons.print,
+                Icons.all_out,
                 color: Colors.grey.shade500,
               ),
               onPressed: () {
@@ -114,7 +114,7 @@ class DashboardPage extends ConsumerWidget {
             ),
             IconButton(
               icon: Icon(
-                Icons.people,
+                Icons.person,
                 color: Colors.grey.shade500,
               ),
               onPressed: () {

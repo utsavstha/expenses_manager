@@ -1,4 +1,5 @@
 import 'package:expense_manager/model/transaction_model.dart';
+import 'package:expense_manager/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/constants.dart';
@@ -19,7 +20,11 @@ class _TransactionListComponentState extends State<TransactionListComponent> {
     return ListView.builder(
       itemCount: widget.transaction.data.length,
       itemBuilder: (context, index) {
-        return Container(
+        return GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(context, Routes.transactionDetail,
+                arguments: widget.transaction.data[index]);
+          },
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,16 +1,98 @@
+import 'package:expense_manager/controller/budget_controller.dart';
+import 'package:expense_manager/model/budget_model.dart';
+import 'package:expense_manager/routes/app_pages.dart';
+import 'package:expense_manager/ui/components/no_data.dart';
+import 'package:expense_manager/ui/components/progress_dialog.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../ui/components/toolbar_component.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../utils/constants.dart';
 
-class BudgetPage extends StatefulWidget {
+class BudgetPage extends ConsumerStatefulWidget {
   const BudgetPage({Key? key}) : super(key: key);
 
   @override
   _BudgetPageState createState() => _BudgetPageState();
 }
 
-class _BudgetPageState extends State<BudgetPage> {
+final budgetNotifierProvider =
+    ChangeNotifierProvider.autoDispose<BudgetController>(
+        (ref) => BudgetController());
+
+class _BudgetPageState extends ConsumerState<BudgetPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      ref.read(budgetNotifierProvider).getBudgets();
+    });
+  }
+
+  Future<void> _deleteDialog(List<Data> data, int index) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirmation',
+            style: TextStyle(
+                fontFamily: 'GTWalsheimPro',
+                color: primaryColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w500),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text(
+                  'Are you sure you would like to delete this item?',
+                  style: TextStyle(
+                      fontFamily: 'GTWalsheimPro',
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Yes',
+                style: TextStyle(
+                    fontFamily: 'GTWalsheimPro',
+                    color: primaryColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                ref.read(budgetNotifierProvider).delete(data[index].id);
+                ref.read(budgetNotifierProvider).getBudgets();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                    fontFamily: 'GTWalsheimPro',
+                    color: accentColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,92 +111,121 @@ class _BudgetPageState extends State<BudgetPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'Budget',
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontFamily: 'GTWalsheimPro',
                       fontSize: 20,
                       fontWeight: FontWeight.w700),
                 ),
                 Row(
                   children: [
-                    const Icon(
-                      Icons.add,
+                    IconButton(
+                      onPressed: () =>
+                          Navigator.pushNamed(context, Routes.addBudget),
+                      icon: const Icon(
+                        Icons.add,
+                      ),
                     ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    const Icon(
-                      Icons.calendar_today_rounded,
-                    )
                   ],
                 )
               ],
             ),
           ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ListView.builder(
-                itemCount: 3,
-                itemBuilder: (context, index) {
-                  return Container(
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Expanded(child: Consumer(
+            builder: (BuildContext context, WidgetRef ref, Widget? child) {
+              final provider = ref.watch(budgetNotifierProvider);
+              if (provider.apiResponse.isLoading) {
+                return const ProgressDialog();
+              }
+              if (provider.apiResponse.model == null ||
+                  (provider.apiResponse.model as Budget).data.isEmpty) {
+                return const NoData();
+              } else {
+                final data = (provider.apiResponse.model as Budget).data;
+
+                return Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: ListView.builder(
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      return Dismissible(
+                        key: Key(data[index].id),
+                        onDismissed: (direction) {
+                          _deleteDialog(data, index);
+                          // setState(() {
+                          //   data.removeAt(index);
+                          // });
+
+                          // ScaffoldMessenger.of(context).showSnackBar(
+                          //     SnackBar(content: Text('Item Deleted')));
+                        },
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Budget Name',
-                                  style: TextStyle(
-                                      fontFamily: 'GTWalsheimPro',
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w300),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      data[index].title,
+                                      style: const TextStyle(
+                                          fontFamily: 'GTWalsheimPro',
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w300),
+                                    ),
+                                    Text(
+                                      'Rs ' +
+                                          data[index].totalAmount.numberDecimal,
+                                      style: const TextStyle(
+                                          fontFamily: 'GTWalsheimPro',
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 6,
                                 ),
                                 Text(
-                                  'Rs 400',
-                                  style: TextStyle(
+                                  'Rs ' + data[index].amount.numberDecimal,
+                                  style: const TextStyle(
                                       fontFamily: 'GTWalsheimPro',
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.w500),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                const SizedBox(
+                                  height: 6,
+                                ),
+                                LinearProgressIndicator(
+                                  value: (double.parse(data[index]
+                                              .totalAmount
+                                              .numberDecimal) /
+                                          double.parse(data[index]
+                                              .amount
+                                              .numberDecimal)) /
+                                      100.0,
+                                  semanticsLabel: 'Linear progress indicator',
                                 ),
                               ],
                             ),
-                            const SizedBox(
-                              height: 6,
-                            ),
-                            Text(
-                              'Rs 3000',
-                              style: TextStyle(
-                                  fontFamily: 'GTWalsheimPro',
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700),
-                            ),
-                            const SizedBox(
-                              height: 6,
-                            ),
-                            LinearProgressIndicator(
-                              value: 10,
-                              semanticsLabel: 'Linear progress indicator',
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          )
+                      );
+                    },
+                  ),
+                );
+              }
+            },
+          ))
         ],
       ),
     ));

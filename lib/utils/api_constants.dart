@@ -6,4 +6,6 @@ class ApiConstants {
   static String changePassword = baseUrl + "users/verifyCode";
   static String createTransaction = baseUrl + "expense/create";
   static String getTransaction = baseUrl + "expense/";
+  static String createBudget = baseUrl + "budget/create";
+  static String getBudgets = baseUrl + "budget";
 }

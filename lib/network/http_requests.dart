@@ -39,6 +39,24 @@ class HttpRequest {
     return _response(response);
   }
 
+  Future<dynamic> deletetWithAuth(url) async {
+    Response response;
+    try {
+      final token = await SaveData.getToken();
+      response = await dio.delete(
+        url,
+        options: Options(
+          headers: {
+            "authorization": "Bearer " + token,
+          },
+        ),
+      );
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return _response(response);
+  }
+
   Future<dynamic> getWithAuth(url) async {
     Response response;
     try {

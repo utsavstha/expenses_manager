@@ -1,3 +1,5 @@
+import 'package:expense_manager/model/transaction_model.dart';
+
 import '../../utils/constants.dart';
 import '../../ui/components/dashed_seperator.dart';
 import '../../ui/components/primary_button.dart';
@@ -13,6 +15,8 @@ class TransactionDetail extends StatefulWidget {
 class _TransactionDetailState extends State<TransactionDetail> {
   @override
   Widget build(BuildContext context) {
+    final transaction = ModalRoute.of(context)!.settings.arguments as Data;
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -28,9 +32,12 @@ class _TransactionDetailState extends State<TransactionDetail> {
               width: double.infinity,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
-                  const Icon(
-                    Icons.arrow_back,
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(
+                      Icons.arrow_back,
+                    ),
                   ),
                   const SizedBox(
                     width: 10,
@@ -65,7 +72,7 @@ class _TransactionDetailState extends State<TransactionDetail> {
                         height: 10,
                       ),
                       Text(
-                        'Breakfast',
+                        transaction.payeeName,
                         style: TextStyle(
                             color: Colors.black,
                             fontFamily: 'GTWalsheimPro',
@@ -92,7 +99,7 @@ class _TransactionDetailState extends State<TransactionDetail> {
                                 height: 10,
                               ),
                               Text(
-                                'Expense',
+                                transaction.type,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontFamily: 'GTWalsheimPro',
@@ -118,7 +125,7 @@ class _TransactionDetailState extends State<TransactionDetail> {
                                 height: 10,
                               ),
                               Text(
-                                '2020-10-10',
+                                transaction.date.split("T")[0],
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontFamily: 'GTWalsheimPro',
@@ -152,7 +159,7 @@ class _TransactionDetailState extends State<TransactionDetail> {
                                       fontWeight: FontWeight.w300),
                                 ),
                                 Text(
-                                  'Rs 300',
+                                  'Rs ' + transaction.amount,
                                   style: TextStyle(
                                       fontFamily: 'GTWalsheimPro',
                                       fontSize: 26,
