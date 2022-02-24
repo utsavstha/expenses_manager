@@ -4,4 +4,6 @@ class ApiConstants {
   static String signupUrl = baseUrl + "users/signup";
   static String forgotPassword = baseUrl + "users/forgotPassword";
   static String changePassword = baseUrl + "users/verifyCode";
+  static String createTransaction = baseUrl + "expense/create";
+  static String getTransaction = baseUrl + "expense/";
 }

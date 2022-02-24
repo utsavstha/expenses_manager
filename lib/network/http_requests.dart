@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:expense_manager/utils/save_data.dart';
 import '../../utils/exceptions.dart';
 
 class HttpRequest {
@@ -36,6 +37,30 @@ class HttpRequest {
       throw FetchDataException('No Internet connection');
     }
     return _response(response);
+  }
+
+  Future<dynamic> postWithAuth(url, Map param) async {
+    Response response;
+    try {
+      print(param);
+      print(url);
+      final token = await SaveData.getToken();
+      response = await dio.post(
+        url,
+        data: param,
+        options: Options(
+          headers: {
+            "authorization": "Bearer " + token,
+          },
+        ),
+      );
+      print(response.data);
+      return _response(response);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    } catch (e) {
+      print(e);
+    }
   }
 
   dynamic _response(Response response) {

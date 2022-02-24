@@ -192,6 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                                 fontWeight: FontWeight.w700),
                           ),
                           TextFormField(
+                            obscureText: true,
                             onSaved: (value) => password = value ?? '',
                             validator: RequiredValidator(
                                 errorText: 'Please enter password'),
