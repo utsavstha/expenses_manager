@@ -1,3 +1,6 @@
+import 'package:expense_manager/ui/components/primary_button.dart';
+import 'package:expense_manager/utils/constants.dart';
+import 'package:expense_manager/utils/save_data.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -8,6 +11,11 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  _logout() {
+    SaveData.saveData('');
+    Navigator.of(context).popUntil((route) => route.isFirst);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,25 +108,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     const SizedBox(
                       height: 30,
                     ),
-                    const Text(
-                      'Date of birth',
-                      style: TextStyle(
-                          fontFamily: 'GTWalsheimPro',
-                          fontSize: 14,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.normal),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    const Text(
-                      '1998-10-11',
-                      style: TextStyle(
-                          fontFamily: 'GTWalsheimPro',
-                          fontSize: 18,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w700),
-                    ),
+                    PrimaryButton(
+                        title: "Logout",
+                        color: primaryColor,
+                        onPress: () {
+                          _logout();
+                        })
                   ],
                 ),
               ),

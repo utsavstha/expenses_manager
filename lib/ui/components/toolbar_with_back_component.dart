@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 class ToolbarWithBackComponent extends StatelessWidget {
   final String title;
-  const ToolbarWithBackComponent({Key? key, required this.title})
+  final onPress;
+  const ToolbarWithBackComponent({Key? key, required this.title, this.onPress})
       : super(key: key);
 
   @override
@@ -19,8 +20,11 @@ class ToolbarWithBackComponent extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.arrow_back,
+          IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+            ),
+            onPressed: onPress,
           ),
           const SizedBox(
             width: 10,

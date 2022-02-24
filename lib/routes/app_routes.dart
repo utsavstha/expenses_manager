@@ -5,6 +5,7 @@ import 'package:expense_manager/ui/pages/dashboard_page.dart';
 import 'package:expense_manager/ui/pages/forgot_password_page.dart';
 import 'package:expense_manager/ui/pages/login_page.dart';
 import 'package:expense_manager/ui/pages/signup_page.dart';
+import 'package:expense_manager/ui/pages/stat_detail_page.dart';
 import 'package:expense_manager/ui/pages/transaction_detail.dart';
 
 import 'app_pages.dart';
@@ -18,6 +19,7 @@ class AppPages {
     Routes.forgotPassword: (context) => const ForgotPasswordPage(),
     Routes.add_transaction: (context) => const AddTransactionPage(),
     Routes.transactionDetail: (context) => const TransactionDetail(),
-    Routes.addBudget: (context) => const CreateBudgetPage()
+    Routes.addBudget: (context) => const CreateBudgetPage(),
+    Routes.statsDetail: (context) => const StatDetailPage()
   };
 }

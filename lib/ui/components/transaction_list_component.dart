@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../utils/constants.dart';
 
 class TransactionListComponent extends StatefulWidget {
-  final Transaction transaction;
+  final List<Data> transaction;
   const TransactionListComponent({Key? key, required this.transaction})
       : super(key: key);
 
@@ -18,12 +18,12 @@ class _TransactionListComponentState extends State<TransactionListComponent> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: widget.transaction.data.length,
+      itemCount: widget.transaction.length,
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () {
             Navigator.pushNamed(context, Routes.transactionDetail,
-                arguments: widget.transaction.data[index]);
+                arguments: widget.transaction[index]);
           },
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -33,18 +33,18 @@ class _TransactionListComponentState extends State<TransactionListComponent> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    widget.transaction.data[index].payeeName,
+                    widget.transaction[index].payeeName,
                     style: const TextStyle(
                         fontFamily: 'GTWalsheimPro',
                         fontSize: 19,
                         fontWeight: FontWeight.w500),
                   ),
                   Text(
-                    "Rs. " + widget.transaction.data[index].amount,
+                    "Rs. " + widget.transaction[index].amount,
                     style: TextStyle(
                         fontFamily: 'GTWalsheimPro',
                         fontSize: 16,
-                        color: widget.transaction.data[index].type == "INCOME"
+                        color: widget.transaction[index].type == "INCOME"
                             ? accentColor
                             : primaryColor,
                         fontWeight: FontWeight.normal),
@@ -55,7 +55,7 @@ class _TransactionListComponentState extends State<TransactionListComponent> {
                 height: 6,
               ),
               Text(
-                widget.transaction.data[index].date.split('T')[0],
+                widget.transaction[index].date.split('T')[0],
                 style: const TextStyle(
                     fontFamily: 'GTWalsheimPro',
                     fontSize: 12,

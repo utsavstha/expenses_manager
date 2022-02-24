@@ -1,11 +1,13 @@
+import 'package:expense_manager/model/stats_detail.dart';
+import 'package:expense_manager/model/transaction_model.dart';
+
 import '../../utils/constants.dart';
 import '../../ui/components/toolbar_with_back_component.dart';
 import '../../ui/components/transaction_list_component.dart';
 import 'package:flutter/material.dart';
 
 class StatDetailPage extends StatefulWidget {
-  final String title;
-  const StatDetailPage({Key? key, required this.title}) : super(key: key);
+  const StatDetailPage({Key? key}) : super(key: key);
 
   @override
   _StatDetailPageState createState() => _StatDetailPageState();
@@ -14,18 +16,29 @@ class StatDetailPage extends StatefulWidget {
 class _StatDetailPageState extends State<StatDetailPage> {
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as StatsDetail;
+    List<Data> transactions = [];
+    for (int i = 0; i < args.transaction.length; i++) {
+      if (args.transaction[i].type.toLowerCase() == args.title.toLowerCase()) {
+        transactions.add(args.transaction[i]);
+      }
+    }
     return Scaffold(
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ToolbarWithBackComponent(title: widget.title),
+            ToolbarWithBackComponent(
+              title: args.title,
+              onPress: () => Navigator.pop(context),
+            ),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                    color: secondaryColor,
+                    color:
+                        args.title == 'Income' ? secondaryColor : primaryColor,
                     borderRadius: BorderRadius.all(Radius.circular(12))),
                 child: Column(
                   children: [
@@ -36,7 +49,7 @@ class _StatDetailPageState extends State<StatDetailPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'May',
+                              'Till Date',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontFamily: 'GTWalsheimPro',
@@ -47,7 +60,7 @@ class _StatDetailPageState extends State<StatDetailPage> {
                               height: 10,
                             ),
                             Text(
-                              'Rs 40000',
+                              'Rs ' + args.total.toString(),
                               style: TextStyle(
                                   color: Colors.white,
                                   fontFamily: 'GTWalsheimPro',
@@ -80,6 +93,9 @@ class _StatDetailPageState extends State<StatDetailPage> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(left: 16.0, right: 16),
+                child: TransactionListComponent(
+                  transaction: transactions,
+                ),
               ),
             )
           ],

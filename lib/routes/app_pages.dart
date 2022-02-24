@@ -6,4 +6,5 @@ abstract class Routes {
   static const add_transaction = '/add_transaction';
   static const transactionDetail = '/transactionDetail';
   static const addBudget = '/addBudget';
+  static const statsDetail = '/statsDetail';
 }

@@ -82,7 +82,9 @@ class _DailyTransactionState extends ConsumerState<DailyTransaction> {
                                 .isEmpty)
                         ? const NoData()
                         : TransactionListComponent(
-                            transaction: provider.apiResponse.model)),
+                            transaction:
+                                (provider.apiResponse.model as Transaction)
+                                    .data)),
               )
             ],
           );

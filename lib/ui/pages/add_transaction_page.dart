@@ -1,5 +1,8 @@
+import 'package:expense_manager/controller/budget_controller.dart';
 import 'package:expense_manager/controller/transaction_controller.dart';
+import 'package:expense_manager/model/budget_model.dart';
 import 'package:expense_manager/ui/components/progress_dialog.dart';
+import 'package:expense_manager/ui/pages/budget_page.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
@@ -29,9 +32,16 @@ final pickedDateProvider = AutoDisposeStateProvider<String>((ref) {
   return "";
 });
 
+final selectedBudget = AutoDisposeStateProvider<Data?>((ref) {
+  return null;
+});
+
 final createTransactionNotifierProvider =
     ChangeNotifierProvider.autoDispose<TransactionController>(
         (ref) => TransactionController());
+
+final budgetNotifier = ChangeNotifierProvider.autoDispose<BudgetController>(
+    (ref) => BudgetController());
 
 class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
   PageController controller = PageController();
@@ -255,10 +265,15 @@ class StepTwo extends ConsumerWidget {
     }, currentTime: DateTime.now(), locale: LocaleType.en);
   }
 
+  List<String> _locations = ['A', 'B', 'C', 'D']; // Option 2
+
   @override
   Widget build(BuildContext context, ref) {
     final expenseType = ref.watch(expenseTypeProvider.state).state;
     final transactionController = ref.watch(createTransactionNotifierProvider);
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      ref.read(budgetNotifier).getBudgets();
+    });
     if (transactionController.apiResponse.isLoading) {
       return const ProgressDialog();
     } else if (transactionController.apiResponse.model != null &&
@@ -379,6 +394,43 @@ class StepTwo extends ConsumerWidget {
                 height: 10,
               ),
               const Text(
+                'Budget',
+                style: TextStyle(
+                    fontFamily: 'GTWalsheimPro',
+                    fontSize: 14,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w700),
+              ),
+              Consumer(builder:
+                  (BuildContext context, WidgetRef ref, Widget? child) {
+                final res = ref.watch(budgetNotifier);
+                if (res.apiResponse.isLoading) {
+                  return const ProgressDialog();
+                } else {
+                  final data = (res.apiResponse.model as Budget).data;
+                  return DropdownButton<Data>(
+                    value: ref.watch(selectedBudget.state).state,
+                    items: data.map((Data value) {
+                      return DropdownMenuItem<Data>(
+                        value: value,
+                        child: Text(value.title,
+                            style: const TextStyle(
+                                fontFamily: 'GTWalsheimPro',
+                                fontSize: 14,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.normal)),
+                      );
+                    }).toList(),
+                    onChanged: (data) {
+                      ref.read(selectedBudget.state).state = data;
+                    },
+                  );
+                }
+              }),
+              const SizedBox(
+                height: 10,
+              ),
+              const Text(
                 'Date',
                 style: TextStyle(
                     fontFamily: 'GTWalsheimPro',
@@ -439,11 +491,17 @@ class StepTwo extends ConsumerWidget {
                           content: Text('Please select expense type')));
                       return;
                     }
+                    if (ref.read(selectedBudget.state).state == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text('Please select Budget')));
+                      return;
+                    }
                     transactionController.transaction(
                         payeeController.text,
                         amountController.text,
                         dateController.text,
-                        expenseType);
+                        expenseType,
+                        ref.read(selectedBudget.state).state!.id);
                   }),
             ],
           ),

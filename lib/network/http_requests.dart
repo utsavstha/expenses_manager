@@ -69,10 +69,12 @@ class HttpRequest {
           },
         ),
       );
+      return _response(response);
     } on SocketException {
       throw FetchDataException('No Internet connection');
+    } catch (e) {
+      print(e);
     }
-    return _response(response);
   }
 
   Future<dynamic> postWithAuth(url, Map param) async {
