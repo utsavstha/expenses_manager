@@ -38,7 +38,7 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
   void onPageChange() {
     controller.animateToPage(1,
         duration: const Duration(milliseconds: 300), curve: Curves.bounceIn);
-    ref.watch(currentPageStateProvider.state).state = 1.0;
+    ref.read(currentPageStateProvider.state).state = 1.0;
   }
 
   @override
@@ -246,9 +246,12 @@ class StepTwo extends ConsumerWidget {
       print('confirm $date');
       dateController.text = date.year.toString() +
           "-" +
-          date.month.toString() +
+          (date.month > 9
+              ? date.month.toString()
+              : "0" + date.month.toString()) +
           "-" +
-          date.day.toString();
+          date.day.toString() +
+          "T00:00:00.000Z";
     }, currentTime: DateTime.now(), locale: LocaleType.en);
   }
 

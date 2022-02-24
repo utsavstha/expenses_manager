@@ -1,9 +1,12 @@
+import 'package:expense_manager/model/transaction_model.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/constants.dart';
 
 class TransactionListComponent extends StatefulWidget {
-  const TransactionListComponent({Key? key}) : super(key: key);
+  final Transaction transaction;
+  const TransactionListComponent({Key? key, required this.transaction})
+      : super(key: key);
 
   @override
   _TransactionListComponentState createState() =>
@@ -14,7 +17,7 @@ class _TransactionListComponentState extends State<TransactionListComponent> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: 10,
+      itemCount: widget.transaction.data.length,
       itemBuilder: (context, index) {
         return Container(
           child: Column(
@@ -25,18 +28,20 @@ class _TransactionListComponentState extends State<TransactionListComponent> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Breakfast',
-                    style: TextStyle(
+                    widget.transaction.data[index].payeeName,
+                    style: const TextStyle(
                         fontFamily: 'GTWalsheimPro',
                         fontSize: 19,
                         fontWeight: FontWeight.w500),
                   ),
                   Text(
-                    'Rs 400',
+                    "Rs. " + widget.transaction.data[index].amount,
                     style: TextStyle(
                         fontFamily: 'GTWalsheimPro',
                         fontSize: 16,
-                        color: accentColor,
+                        color: widget.transaction.data[index].type == "INCOME"
+                            ? accentColor
+                            : primaryColor,
                         fontWeight: FontWeight.normal),
                   ),
                 ],
@@ -45,8 +50,8 @@ class _TransactionListComponentState extends State<TransactionListComponent> {
                 height: 6,
               ),
               Text(
-                'Friday 10:00 AM',
-                style: TextStyle(
+                widget.transaction.data[index].date.split('T')[0],
+                style: const TextStyle(
                     fontFamily: 'GTWalsheimPro',
                     fontSize: 12,
                     fontWeight: FontWeight.w300),

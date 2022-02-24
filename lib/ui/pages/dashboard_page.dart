@@ -1,4 +1,5 @@
 import 'package:expense_manager/routes/app_pages.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../utils/constants.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,11 @@ import 'daily_transactions.dart';
 import 'profile_page.dart';
 import 'stats_page.dart';
 
-class DashboardPage extends StatelessWidget {
+final currentPageStateProvider = AutoDisposeStateProvider<int>((ref) {
+  return 0;
+});
+
+class DashboardPage extends ConsumerWidget {
   const DashboardPage({Key? key}) : super(key: key);
   static const List<Widget> _widgetOptions = <Widget>[
     DailyTransaction(),
@@ -45,7 +50,8 @@ class DashboardPage extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ref) {
+    final currentPage = ref.watch(currentPageStateProvider);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: primaryColor,
@@ -58,7 +64,7 @@ class DashboardPage extends StatelessWidget {
         ), //icon inside button
       ),
       body: SafeArea(
-        child: _widgetOptions.elementAt(0),
+        child: _widgetOptions.elementAt(currentPage),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
@@ -77,14 +83,18 @@ class DashboardPage extends StatelessWidget {
                 Icons.menu,
                 color: Colors.grey.shade500,
               ),
-              onPressed: () {},
+              onPressed: () {
+                ref.read(currentPageStateProvider.state).state = 0;
+              },
             ),
             IconButton(
               icon: Icon(
                 Icons.search,
                 color: Colors.grey.shade500,
               ),
-              onPressed: () {},
+              onPressed: () {
+                ref.read(currentPageStateProvider.state).state = 1;
+              },
             ),
             IconButton(
               icon: Icon(
@@ -98,14 +108,18 @@ class DashboardPage extends StatelessWidget {
                 Icons.print,
                 color: Colors.grey.shade500,
               ),
-              onPressed: () {},
+              onPressed: () {
+                ref.read(currentPageStateProvider.state).state = 3;
+              },
             ),
             IconButton(
               icon: Icon(
                 Icons.people,
                 color: Colors.grey.shade500,
               ),
-              onPressed: () {},
+              onPressed: () {
+                ref.read(currentPageStateProvider.state).state = 4;
+              },
             ),
           ],
         ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ToolbarComponent extends StatelessWidget {
+  final onPress;
   final String title;
-  const ToolbarComponent({Key? key, required this.title}) : super(key: key);
+  const ToolbarComponent({Key? key, required this.title, this.onPress})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +27,11 @@ class ToolbarComponent extends StatelessWidget {
                 fontSize: 20,
                 fontWeight: FontWeight.w700),
           ),
-          const Icon(
-            Icons.calendar_today_rounded,
+          IconButton(
+            onPressed: onPress,
+            icon: const Icon(
+              Icons.calendar_today_rounded,
+            ),
           )
         ],
       ),
