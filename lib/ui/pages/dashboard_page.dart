@@ -1,5 +1,6 @@
 import 'package:expense_manager/routes/app_pages.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shake/shake.dart';
 
 import '../../utils/constants.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +14,14 @@ final currentPageStateProvider = AutoDisposeStateProvider<int>((ref) {
   return 0;
 });
 
-class DashboardPage extends ConsumerWidget {
+class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({Key? key}) : super(key: key);
+
+  @override
+  _DashboardPageState createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends ConsumerState<DashboardPage> {
   static const List<Widget> _widgetOptions = <Widget>[
     DailyTransaction(),
     StatsPage(),
@@ -22,35 +29,17 @@ class DashboardPage extends ConsumerWidget {
     BudgetPage(),
     ProfilePage(),
   ];
-  Future<void> _showMyDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Warning'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text("Registration Error"),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Dismiss'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+
+  @override
+  void initState() {
+    super.initState();
+    ShakeDetector detector = ShakeDetector.autoStart(onPhoneShake: () {
+      Navigator.pushNamed(context, Routes.add_transaction);
+    });
   }
 
   @override
-  Widget build(BuildContext context, ref) {
+  Widget build(BuildContext context) {
     final currentPage = ref.watch(currentPageStateProvider);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
