@@ -34,6 +34,7 @@ class Data {
   late final String amount;
   late final String date;
   late final String createdBy;
+  late final String file;
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
@@ -42,6 +43,7 @@ class Data {
     amount = json['amount'];
     date = json['date'];
     createdBy = json['created_by'];
+    file = json['file'] ?? '';
   }
 
   Map<String, dynamic> toJson() {

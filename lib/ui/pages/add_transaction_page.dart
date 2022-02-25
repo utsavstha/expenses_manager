@@ -5,12 +5,13 @@ import 'package:expense_manager/ui/components/progress_dialog.dart';
 import 'package:expense_manager/ui/pages/budget_page.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../../ui/components/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
+import 'dart:io';
 import '../../utils/constants.dart';
 
 class AddTransactionPage extends ConsumerStatefulWidget {
@@ -30,6 +31,10 @@ final expenseTypeProvider = StateProvider<String>((ref) {
 
 final pickedDateProvider = AutoDisposeStateProvider<String>((ref) {
   return "";
+});
+
+final imageProvider = AutoDisposeStateProvider<XFile?>((ref) {
+  return null;
 });
 
 final selectedBudget = AutoDisposeStateProvider<Data?>((ref) {
@@ -265,7 +270,78 @@ class StepTwo extends ConsumerWidget {
     }, currentTime: DateTime.now(), locale: LocaleType.en);
   }
 
-  List<String> _locations = ['A', 'B', 'C', 'D']; // Option 2
+  Future<void> _imagePicker(BuildContext context, WidgetRef ref) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Select Image',
+            style: TextStyle(
+                fontFamily: 'GTWalsheimPro',
+                color: primaryColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w500),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text(
+                  'Please Select Image Source',
+                  style: TextStyle(
+                      fontFamily: 'GTWalsheimPro',
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Take Picture',
+                style: TextStyle(
+                    fontFamily: 'GTWalsheimPro',
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal),
+              ),
+              onPressed: () {
+                _takePicture(ref);
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Gallery',
+                style: TextStyle(
+                    fontFamily: 'GTWalsheimPro',
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal),
+              ),
+              onPressed: () {
+                _pickGallery(ref);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _pickGallery(WidgetRef ref) async {
+    final ImagePicker _picker = ImagePicker();
+    // Pick an image
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    ref.read(imageProvider.state).state = image;
+  }
+
+  _takePicture(WidgetRef ref) async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
+    ref.read(imageProvider.state).state = photo;
+  }
 
   @override
   Widget build(BuildContext context, ref) {
@@ -335,7 +411,7 @@ class StepTwo extends ConsumerWidget {
                 ],
               ),
               const SizedBox(
-                height: 70,
+                height: 30,
               ),
               const Text(
                 'Payee name',
@@ -404,11 +480,13 @@ class StepTwo extends ConsumerWidget {
               Consumer(builder:
                   (BuildContext context, WidgetRef ref, Widget? child) {
                 final res = ref.watch(budgetNotifier);
-                if (res.apiResponse.isLoading) {
+                if (res.apiResponse.model == null ||
+                    res.apiResponse.isLoading) {
                   return const ProgressDialog();
                 } else {
                   final data = (res.apiResponse.model as Budget).data;
                   return DropdownButton<Data>(
+                    isExpanded: true,
                     value: ref.watch(selectedBudget.state).state,
                     items: data.map((Data value) {
                       return DropdownMenuItem<Data>(
@@ -462,8 +540,47 @@ class StepTwo extends ConsumerWidget {
                 ),
               ),
               const SizedBox(
-                height: 50,
+                height: 10,
               ),
+              const Text(
+                'Receipt Image',
+                style: TextStyle(
+                    fontFamily: 'GTWalsheimPro',
+                    fontSize: 14,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Container(
+                  child: ref.watch(imageProvider.state).state == null
+                      ? GestureDetector(
+                          onTap: () => _imagePicker(context, ref),
+                          child: Container(
+                              width: double.infinity,
+                              height: 150,
+                              decoration: BoxDecoration(
+                                  color: Colors.grey.shade300,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(12))),
+                              child: const Center(
+                                child: Icon(Icons.image),
+                              )),
+                        )
+                      : Container(
+                          child: Image.file(
+                              File(ref.read(imageProvider.state).state!.path)),
+                        )),
+              const SizedBox(
+                height: 10,
+              ),
+
+              // Image(image: image)
+              const SizedBox(
+                height: 20,
+              ),
+
               PrimaryButton(
                   title: "FINISH",
                   color: primaryColor,
@@ -496,12 +613,22 @@ class StepTwo extends ConsumerWidget {
                           content: Text('Please select Budget')));
                       return;
                     }
-                    transactionController.transaction(
-                        payeeController.text,
-                        amountController.text,
-                        dateController.text,
-                        expenseType,
-                        ref.read(selectedBudget.state).state!.id);
+                    if (ref.read(imageProvider.state).state == null) {
+                      transactionController.transaction(
+                          payeeController.text,
+                          amountController.text,
+                          dateController.text,
+                          expenseType,
+                          ref.read(selectedBudget.state).state!.id);
+                    } else {
+                      transactionController.transaction(
+                          payeeController.text,
+                          amountController.text,
+                          dateController.text,
+                          expenseType,
+                          ref.read(selectedBudget.state).state!.id,
+                          file: ref.read(imageProvider.state).state!.path);
+                    }
                   }),
             ],
           ),

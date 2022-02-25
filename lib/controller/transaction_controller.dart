@@ -2,11 +2,12 @@ import 'dart:convert';
 
 import 'package:expense_manager/model/login_model.dart';
 import 'package:expense_manager/network/http_requests.dart';
-
+import 'package:dio/dio.dart';
 import 'package:expense_manager/utils/api_constants.dart';
 import 'package:expense_manager/utils/api_response.dart';
 import 'package:flutter/material.dart';
-import 'package:result_type/result_type.dart';
+import 'package:mime_type/mime_type.dart';
+import 'package:http_parser/http_parser.dart';
 
 class TransactionController extends ChangeNotifier {
   bool isLoading = true;
@@ -23,21 +24,39 @@ class TransactionController extends ChangeNotifier {
     httpRequest = HttpRequest();
   }
 
-  void transaction(String payeeName, String amount, String date, String type,
-      String budget) async {
+  void transaction(String payeeName, String amount, String date,
+      String transactionType, String budget,
+      {String file = ""}) async {
     apiResponse = ApiResponse.loading(true);
     notifyListeners();
 
-    final Map<String, String> data = {
-      "payee_name": payeeName,
-      "amount": amount,
-      "date": date,
-      "budget": budget,
-      "type": type.toUpperCase(),
-    };
+    Map<String, dynamic> data = {};
+    if (file.isNotEmpty) {
+      String? mimeType = mime(file);
+      String mimee = mimeType!.split('/')[0];
+      String type = mimeType.split('/')[1];
+      data = {
+        "payee_name": payeeName,
+        "amount": amount,
+        "date": date,
+        "budget": budget,
+        "type": transactionType.toUpperCase(),
+        'file': await MultipartFile.fromFile(file,
+            filename: file, contentType: MediaType(mimee, type))
+      };
+    } else {
+      data = {
+        "payee_name": payeeName,
+        "amount": amount,
+        "date": date,
+        "budget": budget,
+        "type": transactionType.toUpperCase(),
+      };
+    }
+
     try {
       var response =
-          await httpRequest.postWithAuth(ApiConstants.createTransaction, data);
+          await httpRequest.postMultiPart(ApiConstants.createTransaction, data);
       if (response['status'] == 'success') {
         success = true;
         apiResponse = ApiResponse.success(false, success);

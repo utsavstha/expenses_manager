@@ -1,4 +1,5 @@
 import 'package:expense_manager/model/transaction_model.dart';
+import 'package:expense_manager/utils/api_constants.dart';
 
 import '../../utils/constants.dart';
 import '../../ui/components/dashed_seperator.dart';
@@ -196,6 +197,13 @@ class _TransactionDetailState extends State<TransactionDetail> {
                   ),
                 ),
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: transaction.file.isNotEmpty
+                  ? Image.network(
+                      ApiConstants.imageBaseaseUrl + transaction.file)
+                  : Container(),
             )
           ],
         ),

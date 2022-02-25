@@ -101,6 +101,34 @@ class HttpRequest {
     }
   }
 
+  Future<dynamic> postMultiPart(url, Map<String, dynamic> param) async {
+    Response response;
+    try {
+      print(param);
+      print(url);
+      final token = await SaveData.getToken();
+
+      dio.options.headers["Content-Type"] = "multipart/form-data";
+      FormData formData = FormData.fromMap(param);
+
+      response = await dio.post(
+        url,
+        data: formData,
+        options: Options(
+          headers: {
+            "authorization": "Bearer " + token,
+          },
+        ),
+      );
+      print(response.data);
+      return _response(response);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    } catch (e) {
+      print(e);
+    }
+  }
+
   dynamic _response(Response response) {
     switch (response.statusCode) {
       case 200:
