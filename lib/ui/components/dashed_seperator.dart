@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// A simple component to draw dashed lines
 class DashedSeparator extends StatelessWidget {
   final double height;
   final Color color;

@@ -1,6 +1,7 @@
 import '../../utils/constants.dart';
 import 'package:flutter/material.dart';
 
+/// A custom component used as a standard button throughout the project
 class PrimaryButton extends StatelessWidget {
   final String title;
   // ignore: prefer_typing_uninitialized_variables
