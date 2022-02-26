@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 
+/// This component handles drawing of line graph, a list of transactions
+/// is passed to it, this list is seperated into expenses and income categories
+/// which is then plotted as lines in a graph
+// ignore: must_be_immutable
 class ChartComponent extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
   List<Data> transaction;
