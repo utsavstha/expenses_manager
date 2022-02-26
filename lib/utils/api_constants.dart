@@ -1,3 +1,4 @@
+/// Static variables for all urls used in the app
 class ApiConstants {
   static String baseUrl = "http://192.168.10.65:3000/api/v1/";
   static String imageBaseaseUrl = "http://192.168.10.65:3000/public/";
