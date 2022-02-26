@@ -84,6 +84,78 @@ class _DailyTransactionState extends ConsumerState<DailyTransaction> {
     });
   }
 
+  /// A confirmation dialog that is shown before deleting the item
+  Future<void> _deleteDialog(List<Data> data, int index) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirmation',
+            style: TextStyle(
+                fontFamily: 'GTWalsheimPro',
+                color: primaryColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w500),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text(
+                  'Are you sure you would like to delete this item?',
+                  style: TextStyle(
+                      fontFamily: 'GTWalsheimPro',
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Yes',
+                style: TextStyle(
+                    fontFamily: 'GTWalsheimPro',
+                    color: primaryColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                ref.read(dailyTransactionProvider).delete(data[index].id);
+                DateTime now = DateTime.now();
+
+                ref.read(dailyTransactionProvider).getTransaction(
+                    now.year.toString() +
+                        "-" +
+                        (now.month > 9
+                            ? now.month.toString()
+                            : "0" + now.month.toString()) +
+                        "-" +
+                        now.day.toString());
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                    fontFamily: 'GTWalsheimPro',
+                    color: accentColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void onDateSelect(BuildContext context, WidgetRef ref) {
     DatePicker.showDatePicker(context,
         showTitleActions: true,
@@ -124,7 +196,9 @@ class _DailyTransactionState extends ConsumerState<DailyTransaction> {
                 child: (provider.transactions.isEmpty
                     ? const NoData()
                     : TransactionListComponent(
-                        transaction: (provider.transactions))),
+                        transaction: (provider.transactions),
+                        onDelete: _deleteDialog,
+                      )),
               ))
             ],
           );

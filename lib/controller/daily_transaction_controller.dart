@@ -45,4 +45,25 @@ class DailyTransactionController extends ChangeNotifier {
 
     notifyListeners();
   }
+
+  void delete(String id) async {
+    apiResponse = ApiResponse.loading(true);
+    notifyListeners();
+
+    try {
+      var response = await httpRequest
+          .deletetWithAuth(ApiConstants.getTransaction + "/" + id);
+
+      success = true;
+      apiResponse = ApiResponse.success(false, success);
+
+      // return Success(true);
+    } catch (e) {
+      print(e);
+      // return Failure('Could not login');
+      apiResponse = ApiResponse.error(false, "Could not Transaction");
+    }
+
+    notifyListeners();
+  }
 }
