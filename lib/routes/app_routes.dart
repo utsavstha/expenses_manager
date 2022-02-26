@@ -10,6 +10,7 @@ import 'package:expense_manager/ui/pages/verify_code_page.dart';
 
 import 'app_pages.dart';
 
+/// Provies static  variables for routing
 class AppPages {
   static const initial = Routes.login;
   static final routes = {
