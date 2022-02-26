@@ -24,6 +24,37 @@ class TransactionController extends ChangeNotifier {
     httpRequest = HttpRequest();
   }
 
+  void updateTransaction(String payeeName, String amount, String date,
+      String transactionType, String id) async {
+    apiResponse = ApiResponse.loading(true);
+    notifyListeners();
+    Map<String, dynamic> data = {
+      "payee_name": payeeName,
+      "amount": amount,
+      "date": date,
+      "type": transactionType.toUpperCase(),
+    };
+
+    try {
+      var response = await httpRequest.patchWithAuth(
+          ApiConstants.getTransaction + id, data);
+      if (response['status'] == 'success') {
+        success = true;
+        apiResponse = ApiResponse.success(false, success);
+      } else {
+        apiResponse = ApiResponse.error(false, "Could not Transaction");
+      }
+
+      // return Success(true);
+    } catch (e) {
+      print(e);
+      // return Failure('Could not login');
+      apiResponse = ApiResponse.error(false, "Could not Transaction");
+    }
+
+    notifyListeners();
+  }
+
   void transaction(String payeeName, String amount, String date,
       String transactionType, String budget,
       {String file = ""}) async {

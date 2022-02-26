@@ -1,3 +1,5 @@
+import 'package:floor/floor.dart';
+
 class Transaction {
   Transaction({
     required this.status,
@@ -19,6 +21,7 @@ class Transaction {
   }
 }
 
+@entity
 class Data {
   Data({
     required this.id,
@@ -28,6 +31,7 @@ class Data {
     required this.date,
     required this.createdBy,
   });
+  @primaryKey
   late final String id;
   late final String payeeName;
   late final String type;

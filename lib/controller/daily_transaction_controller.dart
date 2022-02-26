@@ -16,6 +16,7 @@ class DailyTransactionController extends ChangeNotifier {
   bool success = false;
   late HttpRequest httpRequest;
   late Transaction transactionModel;
+  List<Data> transactions = [];
   late ApiResponse apiResponse;
 
   DailyTransactionController() {
@@ -33,6 +34,7 @@ class DailyTransactionController extends ChangeNotifier {
           await httpRequest.getWithAuth(ApiConstants.getTransaction + date);
       transactionModel = Transaction.fromJson(response);
       apiResponse = ApiResponse.success(false, transactionModel);
+      transactions = transactionModel.data;
       print(apiResponse);
       // return Success(true);
     } catch (e) {

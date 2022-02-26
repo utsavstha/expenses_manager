@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:expense_manager/controller/stat_controller.dart';
 import 'package:expense_manager/model/stats_detail.dart';
 import 'package:expense_manager/model/transaction_model.dart';
+import 'package:expense_manager/provider/database_provider.dart';
 import 'package:expense_manager/routes/app_pages.dart';
 import 'package:expense_manager/ui/components/no_data.dart';
 import 'package:expense_manager/ui/components/progress_dialog.dart';
+import 'package:expense_manager/utils/connection_status.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../utils/constants.dart';
@@ -29,9 +33,40 @@ class StatsPage extends ConsumerStatefulWidget {
 }
 
 class _StateState extends ConsumerState<StatsPage> {
+  late StreamSubscription _connectionChangeStream;
+  late ConnectionStatusSingleton connectionStatus;
   @override
   void initState() {
     super.initState();
+    WidgetsFlutterBinding.ensureInitialized();
+
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      ref.read(statsNotifierProvider).getExpenses();
+    });
+
+    connectionStatus = ConnectionStatusSingleton.getInstance();
+    _connectionChangeStream =
+        connectionStatus.connectionChange.listen(connectionChanged);
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      if (connectionStatus.hasConnection) {
+        WidgetsBinding.instance!.addPostFrameCallback((_) {
+          ref.read(statsNotifierProvider).getExpenses();
+        });
+      } else {
+        _fetchLocal();
+      }
+    });
+  }
+
+  _fetchLocal() async {
+    final dao = ref.read(databaseProvider.state).state;
+    if (dao != null) {
+      final localTransactions = await dao.findAllTransaction();
+      ref.read(statsNotifierProvider).transactions = localTransactions;
+    }
+  }
+
+  void connectionChanged(dynamic hasConnection) {
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       ref.read(statsNotifierProvider).getExpenses();
     });
@@ -47,6 +82,18 @@ class _StateState extends ConsumerState<StatsPage> {
     return total;
   }
 
+  void _insertData(List<Data> transactions) async {
+    if (ref.read(databaseProvider.state).state != null) {
+      final dao = ref.read(databaseProvider);
+      final localTransactions = await dao!.findAllTransaction();
+      print(localTransactions);
+      await dao.deleteAll(localTransactions);
+      for (int i = 0; i < transactions.length; i++) {
+        await dao.insertData(transactions[i]);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(statsNotifierProvider);
@@ -54,16 +101,18 @@ class _StateState extends ConsumerState<StatsPage> {
     if (provider.apiResponse.isLoading) {
       return const Scaffold(body: SafeArea(child: ProgressDialog()));
     }
-    if (provider.apiResponse.model == null ||
-        (provider.apiResponse.model as Transaction).data.isEmpty) {
+    if (provider.transactions.isEmpty) {
       return const Scaffold(body: SafeArea(child: NoData()));
     } else {
       WidgetsBinding.instance!.addPostFrameCallback((_) {
-        ref.read(totalIncomeProvider.state).state = _calculateTotal(
-            (provider.apiResponse.model as Transaction).data, "INCOME");
+        if (connectionStatus.hasConnection) {
+          _insertData(provider.transactions);
+        }
+        ref.read(totalIncomeProvider.state).state =
+            _calculateTotal(provider.transactions, "INCOME");
 
-        ref.read(totalExpenseProvider.state).state = _calculateTotal(
-            (provider.apiResponse.model as Transaction).data, "EXPENSE");
+        ref.read(totalExpenseProvider.state).state =
+            _calculateTotal(provider.transactions, "EXPENSE");
       });
 
       return Scaffold(
@@ -110,9 +159,7 @@ class _StateState extends ConsumerState<StatsPage> {
                       SizedBox(
                           height: 300,
                           child: ChartComponent(
-                            transaction:
-                                (provider.apiResponse.model as Transaction)
-                                    .data,
+                            transaction: provider.transactions,
                           )),
                     ],
                   ),

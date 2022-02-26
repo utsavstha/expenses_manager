@@ -2,17 +2,26 @@ import 'package:expense_manager/ui/components/primary_button.dart';
 import 'package:expense_manager/utils/constants.dart';
 import 'package:expense_manager/utils/save_data.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+final emailProvider = FutureProvider<String>((ref) async {
+  return await SaveData.getEmail();
+});
+
+final nameProvider = FutureProvider<String>((ref) async {
+  return await SaveData.getName();
+});
+
+class _ProfilePageState extends ConsumerState<ProfilePage> {
   _logout() {
-    SaveData.saveData('');
+    SaveData.saveData('', '', '');
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
@@ -69,13 +78,19 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ),
-                    Text(
-                      'Utsav Shrestha',
-                      style: const TextStyle(
-                          fontFamily: 'GTWalsheimPro',
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700),
-                    ),
+                    ref.watch(nameProvider).when(
+                          data: (data) {
+                            return Text(
+                              data,
+                              style: const TextStyle(
+                                  fontFamily: 'GTWalsheimPro',
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700),
+                            );
+                          },
+                          error: (err, stack) => Text('Error: $err'),
+                          loading: () => const CircularProgressIndicator(),
+                        ),
                   ],
                 ),
               ),
@@ -97,14 +112,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     const SizedBox(
                       height: 10,
                     ),
-                    const Text(
-                      'utsavstha@outlook.com',
-                      style: TextStyle(
-                          fontFamily: 'GTWalsheimPro',
-                          fontSize: 18,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w700),
-                    ),
+                    ref.watch(emailProvider).when(
+                          data: (data) {
+                            return Text(
+                              data,
+                              style: TextStyle(
+                                  fontFamily: 'GTWalsheimPro',
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w700),
+                            );
+                          },
+                          error: (err, stack) => Text('Error: $err'),
+                          loading: () => const CircularProgressIndicator(),
+                        ),
                     const SizedBox(
                       height: 30,
                     ),

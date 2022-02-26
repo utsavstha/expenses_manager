@@ -1,5 +1,4 @@
 import 'package:expense_manager/controller/forgotpassword_controller.dart';
-import 'package:expense_manager/routes/app_pages.dart';
 import 'package:expense_manager/ui/components/progress_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -9,8 +8,8 @@ import '../components/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class ForgotPasswordPage extends ConsumerStatefulWidget {
-  const ForgotPasswordPage({Key? key}) : super(key: key);
+class VerifyCodePage extends ConsumerStatefulWidget {
+  const VerifyCodePage({Key? key}) : super(key: key);
 
   @override
   _ForgotPasswordPageState createState() => _ForgotPasswordPageState();
@@ -19,15 +18,23 @@ class ForgotPasswordPage extends ConsumerStatefulWidget {
 final forgotPasswordProvider = ChangeNotifierProvider<ForgotPasswordController>(
     (ref) => ForgotPasswordController());
 
-class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
-  var emailController = TextEditingController();
+class _ForgotPasswordPageState extends ConsumerState<VerifyCodePage> {
+  var codeController = TextEditingController();
+  var passwordController = TextEditingController();
+  var confirmController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final email = ModalRoute.of(context)!.settings.arguments as String;
     final provider = ref.watch(forgotPasswordProvider);
     if (provider.success) {
       WidgetsBinding.instance!.addPostFrameCallback((_) {
-        Navigator.pushNamed(context, Routes.verifyCode,
-            arguments: emailController.text);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text('Your password has been reset'),
+            action: SnackBarAction(
+                label: "Sign In",
+                onPressed: () {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                })));
       });
     }
     return Scaffold(
@@ -83,7 +90,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                           ),
                           const SizedBox(height: 30),
                           const Text(
-                            'Forgot your password?',
+                            'Please enter your verification code',
                             style: TextStyle(
                                 fontFamily: 'GTWalsheimPro',
                                 fontSize: 20,
@@ -91,7 +98,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                           ),
                           const SizedBox(height: 30),
                           const Text(
-                            'Email',
+                            'Verification Code',
                             style: TextStyle(
                                 fontFamily: 'GTWalsheimPro',
                                 fontSize: 14,
@@ -99,16 +106,70 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                 fontWeight: FontWeight.w700),
                           ),
                           TextField(
-                            controller: emailController,
+                            controller: codeController,
                             keyboardType: TextInputType.emailAddress,
                             style: const TextStyle(
                                 fontFamily: 'GTWalsheimPro',
                                 fontSize: 14,
                                 color: Colors.black,
                                 fontWeight: FontWeight.w700),
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                                 border: UnderlineInputBorder(),
-                                hintText: 'name@domain.com',
+                                hintText: '000000',
+                                hintStyle: TextStyle(
+                                    fontFamily: 'GTWalsheimPro',
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w700)),
+                          ),
+                          const SizedBox(height: 10),
+                          const Text(
+                            'New Password',
+                            style: TextStyle(
+                                fontFamily: 'GTWalsheimPro',
+                                fontSize: 14,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          TextField(
+                            obscureText: true,
+                            controller: passwordController,
+                            keyboardType: TextInputType.visiblePassword,
+                            style: const TextStyle(
+                                fontFamily: 'GTWalsheimPro',
+                                fontSize: 14,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w700),
+                            decoration: const InputDecoration(
+                                border: UnderlineInputBorder(),
+                                hintText: '*******',
+                                hintStyle: TextStyle(
+                                    fontFamily: 'GTWalsheimPro',
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w700)),
+                          ),
+                          const SizedBox(height: 30),
+                          const Text(
+                            'Confirm Password',
+                            style: TextStyle(
+                                fontFamily: 'GTWalsheimPro',
+                                fontSize: 14,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          TextField(
+                            obscureText: true,
+                            controller: confirmController,
+                            keyboardType: TextInputType.visiblePassword,
+                            style: const TextStyle(
+                                fontFamily: 'GTWalsheimPro',
+                                fontSize: 14,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w700),
+                            decoration: const InputDecoration(
+                                border: UnderlineInputBorder(),
+                                hintText: '000000',
                                 hintStyle: TextStyle(
                                     fontFamily: 'GTWalsheimPro',
                                     fontSize: 14,
@@ -120,16 +181,34 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                               title: "Submit",
                               color: primaryColor,
                               onPress: () {
-                                if (emailController.text.isEmpty) {
+                                if (codeController.text.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content: Text(
-                                              'Please your email address')));
+                                              'Please your verification code')));
                                   return;
                                 }
-                                ref
-                                    .read(forgotPasswordProvider)
-                                    .forgot(emailController.text);
+
+                                if (passwordController.text.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Please your new password')));
+                                  return;
+                                }
+
+                                if (passwordController.text !=
+                                    confirmController.text) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Please make sure your passwords match')));
+                                  return;
+                                }
+                                ref.read(forgotPasswordProvider).verifyCode(
+                                    codeController.text,
+                                    email,
+                                    passwordController.text);
                               }),
                           const SizedBox(height: 30),
                         ],

@@ -2,13 +2,28 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SaveData {
   static String token = "token";
-  static void saveData(String tokenData) async {
+  static String email = "email";
+  static String name = "name";
+  static void saveData(
+      String tokenData, String emailData, String nameData) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(SaveData.token, tokenData);
+    await prefs.setString(SaveData.email, emailData);
+    await prefs.setString(SaveData.name, nameData);
   }
 
   static Future<String> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(SaveData.token) ?? "";
+  }
+
+  static Future<String> getName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(SaveData.name) ?? "";
+  }
+
+  static Future<String> getEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(SaveData.email) ?? "";
   }
 }

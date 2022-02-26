@@ -1,4 +1,6 @@
+import 'package:expense_manager/model/login_model.dart';
 import 'package:expense_manager/routes/app_pages.dart';
+import 'package:expense_manager/utils/save_data.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 
 import '../../ui/components/progress_dialog.dart';
@@ -60,6 +62,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
           builder: (BuildContext context, WidgetRef ref, Widget? child) {
             final provider = ref.watch(signupProvider);
             if (provider.apiResponse.model != null) {
+              final model = (provider.apiResponse.model as LoginModel);
+              SaveData.saveData(
+                  model.token, model.data.user.email, model.data.user.name);
               WidgetsBinding.instance!.addPostFrameCallback((_) {
                 Navigator.pushNamed(context, Routes.home);
               });

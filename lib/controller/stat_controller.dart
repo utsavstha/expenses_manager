@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:expense_manager/model/login_model.dart';
 import 'package:expense_manager/model/transaction_model.dart';
 import 'package:expense_manager/network/http_requests.dart';
 
@@ -17,6 +16,7 @@ class StatsController extends ChangeNotifier {
   bool success = false;
   late HttpRequest httpRequest;
   late Transaction transactionModel;
+  List<Data> transactions = [];
   late ApiResponse apiResponse;
 
   StatsController() {
@@ -31,7 +31,7 @@ class StatsController extends ChangeNotifier {
       var response = await httpRequest.getWithAuth(ApiConstants.getTransaction);
       transactionModel = Transaction.fromJson(response);
       apiResponse = ApiResponse.success(false, transactionModel);
-
+      transactions = transactionModel.data;
       // return Success(true);
     } catch (e) {
       print(e);

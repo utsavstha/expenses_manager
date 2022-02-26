@@ -1,3 +1,6 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:expense_manager/database/database.dart';
+import 'package:expense_manager/provider/database_provider.dart';
 import 'package:expense_manager/routes/app_pages.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shake/shake.dart';
@@ -33,9 +36,17 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
   @override
   void initState() {
     super.initState();
+    _setupDB();
     ShakeDetector detector = ShakeDetector.autoStart(onPhoneShake: () {
       Navigator.pushNamed(context, Routes.add_transaction);
     });
+  }
+
+  _setupDB() async {
+    final database =
+        await $FloorAppDatabase.databaseBuilder('flutter_database.db').build();
+    final dao = database.transactionDao;
+    ref.read(databaseProvider.state).state = dao;
   }
 
   @override

@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:expense_manager/controller/daily_transaction_controller.dart';
 import 'package:expense_manager/model/transaction_model.dart';
+import 'package:expense_manager/provider/database_provider.dart';
 import 'package:expense_manager/ui/components/no_data.dart';
 import 'package:expense_manager/ui/components/progress_dialog.dart';
+import 'package:expense_manager/utils/connection_status.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,13 +27,53 @@ class DailyTransaction extends ConsumerStatefulWidget {
 }
 
 class _DailyTransactionState extends ConsumerState<DailyTransaction> {
-  final items = [
-    {'title': 'Breakfast', 'price': 'Rs 100', 'date': '2022-01-10'}
-  ];
+  late StreamSubscription _connectionChangeStream;
 
   @override
   void initState() {
     super.initState();
+    DateTime now = DateTime.now();
+    ConnectionStatusSingleton connectionStatus =
+        ConnectionStatusSingleton.getInstance();
+    _connectionChangeStream =
+        connectionStatus.connectionChange.listen(connectionChanged);
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      final dao = ref.read(databaseProvider.state).state;
+      DateTime now = DateTime.now();
+      if (connectionStatus.hasConnection) {
+        WidgetsBinding.instance!.addPostFrameCallback((_) {
+          ref.read(dailyTransactionProvider).getTransaction(
+              now.year.toString() +
+                  "-" +
+                  (now.month > 9
+                      ? now.month.toString()
+                      : "0" + now.month.toString()) +
+                  "-" +
+                  now.day.toString());
+        });
+      } else {
+        _fetchLocal();
+      }
+    });
+  }
+
+  _fetchLocal() async {
+    final dao = ref.read(databaseProvider.state).state;
+    if (dao != null) {
+      DateTime now = DateTime.now();
+      final all = await dao.findAllTransaction();
+      final localTransactions = await dao.findTransactionByDate(now.year
+              .toString() +
+          "-" +
+          (now.month > 9 ? now.month.toString() : "0" + now.month.toString()) +
+          "-" +
+          now.day.toString() +
+          "T00:00:00.000Z");
+      ref.read(dailyTransactionProvider).transactions = localTransactions;
+    }
+  }
+
+  void connectionChanged(dynamic hasConnection) {
     DateTime now = DateTime.now();
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       ref.read(dailyTransactionProvider).getTransaction(now.year.toString() +
@@ -53,6 +97,7 @@ class _DailyTransactionState extends ConsumerState<DailyTransaction> {
                 : "0" + date.month.toString()) +
             "-" +
             date.day.toString());
+        ref.read(dailyTransactionProvider).apiResponse.isLoading = false;
       });
     }, currentTime: DateTime.now(), locale: LocaleType.en);
   }
@@ -74,18 +119,13 @@ class _DailyTransactionState extends ConsumerState<DailyTransaction> {
                 },
               ),
               Expanded(
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: (provider.apiResponse.model == null ||
-                            (provider.apiResponse.model as Transaction)
-                                .data
-                                .isEmpty)
-                        ? const NoData()
-                        : TransactionListComponent(
-                            transaction:
-                                (provider.apiResponse.model as Transaction)
-                                    .data)),
-              )
+                  child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: (provider.transactions.isEmpty
+                    ? const NoData()
+                    : TransactionListComponent(
+                        transaction: (provider.transactions))),
+              ))
             ],
           );
         }

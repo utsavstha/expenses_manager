@@ -37,7 +37,7 @@ class LoginController extends ChangeNotifier {
       apiResponse = ApiResponse.success(false, loginModel);
       // return Success(true);
     } catch (e) {
-      // print(e);
+      print(e);
       // return Failure('Could not login');
       apiResponse = ApiResponse.error(false, "Could not login");
     }

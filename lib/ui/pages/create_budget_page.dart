@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:expense_manager/controller/budget_controller.dart';
 import 'package:expense_manager/ui/components/progress_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,6 +34,20 @@ class _CreateBudgetPageState extends ConsumerState<CreateBudgetPage> {
             return const ProgressDialog();
           }
           if (provider.success) {
+            AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+              if (!isAllowed) {
+                // This is just a basic example. For real apps, you must show some
+                // friendly dialog box before call the request method.
+                // This is very important to not harm the user experience
+                AwesomeNotifications().requestPermissionToSendNotifications();
+              }
+              AwesomeNotifications().createNotification(
+                  content: NotificationContent(
+                      id: 10,
+                      channelKey: 'basic_channel',
+                      title: 'Budget Created',
+                      body: 'A new budget was created'));
+            });
             Navigator.pop(context);
           }
           return Form(

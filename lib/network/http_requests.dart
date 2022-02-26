@@ -77,6 +77,30 @@ class HttpRequest {
     }
   }
 
+  Future<dynamic> patchWithAuth(url, Map param) async {
+    Response response;
+    try {
+      print(param);
+      print(url);
+      final token = await SaveData.getToken();
+      response = await dio.patch(
+        url,
+        data: param,
+        options: Options(
+          headers: {
+            "authorization": "Bearer " + token,
+          },
+        ),
+      );
+      print(response.data);
+      return _response(response);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future<dynamic> postWithAuth(url, Map param) async {
     Response response;
     try {
