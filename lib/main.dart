@@ -12,6 +12,8 @@ void main() async {
   ConnectionStatusSingleton connectionStatus =
       ConnectionStatusSingleton.getInstance();
   connectionStatus.initialize();
+
+  /// Intializing a notification sender, this is being used to send notification to wear os
   AwesomeNotifications().initialize(
       // set the icon to null if you want to use the default app icon
       '',
