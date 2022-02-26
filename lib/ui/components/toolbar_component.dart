@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Used to show top toolbar
 class ToolbarComponent extends StatelessWidget {
   final onPress;
   final String title;

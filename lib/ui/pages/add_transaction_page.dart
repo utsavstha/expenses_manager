@@ -14,6 +14,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:io';
 import '../../utils/constants.dart';
 
+/// This page is used to add transactions
+/// It uses riverpod for state management
 class AddTransactionPage extends ConsumerStatefulWidget {
   const AddTransactionPage({Key? key}) : super(key: key);
 
@@ -21,26 +23,33 @@ class AddTransactionPage extends ConsumerStatefulWidget {
   _AddTransactionPageState createState() => _AddTransactionPageState();
 }
 
+/// used to track and update a linear progress indicator in the component
 final currentPageStateProvider = AutoDisposeStateProvider<double>((ref) {
   return 0.5;
 });
 
+/// used to track and update a expense type drop down
 final expenseTypeProvider = StateProvider<String>((ref) {
   return "";
 });
 
+/// used to track and update a date picker
 final pickedDateProvider = AutoDisposeStateProvider<String>((ref) {
   return "";
 });
 
+/// used to track and update a image picker
 final imageProvider = AutoDisposeStateProvider<XFile?>((ref) {
   return null;
 });
 
+/// used to track and update a budget picker
 final selectedBudget = AutoDisposeStateProvider<Data?>((ref) {
   return null;
 });
 
+/// A Change notifier provider which provides a transaction controller which is used to make
+/// api calls and listen for results while updating the ui accordingly
 final createTransactionNotifierProvider =
     ChangeNotifierProvider.autoDispose<TransactionController>(
         (ref) => TransactionController());

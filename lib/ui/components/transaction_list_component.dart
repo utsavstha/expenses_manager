@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../../utils/constants.dart';
 
+/// This list is being used to display transaction lists
+/// a List<Data> is passed to this component which it uses to display the list
 class TransactionListComponent extends StatefulWidget {
   final List<Data> transaction;
   const TransactionListComponent({Key? key, required this.transaction})

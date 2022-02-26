@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// A toolbar component which has a back button as well
 class ToolbarWithBackComponent extends StatelessWidget {
   final String title;
   final onPress;
