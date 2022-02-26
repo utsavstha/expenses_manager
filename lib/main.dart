@@ -8,6 +8,7 @@ import 'dao/transaction_dao.dart';
 import 'database/database.dart';
 
 void main() async {
+  /// Intializing a singlegon class that works as network state notifier
   ConnectionStatusSingleton connectionStatus =
       ConnectionStatusSingleton.getInstance();
   connectionStatus.initialize();
