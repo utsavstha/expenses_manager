@@ -5,7 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:expense_manager/utils/save_data.dart';
 import '../../utils/exceptions.dart';
 
+/// Handles all sort of WebAPI calls using a dio library
 class HttpRequest {
+  // Creating a singleton
   static final HttpRequest _httpRequest = HttpRequest._internal();
   late Dio dio;
   factory HttpRequest() {
@@ -15,7 +17,7 @@ class HttpRequest {
   HttpRequest._internal() {
     dio = Dio();
   }
-
+  // Handles get request
   Future<dynamic> get(url) async {
     Response response;
     try {
@@ -26,6 +28,7 @@ class HttpRequest {
     return _response(response);
   }
 
+  // handles post reqests
   Future<dynamic> post(url, Map param) async {
     Response response;
     try {
@@ -39,6 +42,7 @@ class HttpRequest {
     return _response(response);
   }
 
+  // handles delete requests
   Future<dynamic> deletetWithAuth(url) async {
     Response response;
     try {
@@ -57,6 +61,7 @@ class HttpRequest {
     return _response(response);
   }
 
+  // handles get with auth
   Future<dynamic> getWithAuth(url) async {
     Response response;
     try {
@@ -77,6 +82,7 @@ class HttpRequest {
     }
   }
 
+  // handles patch with auth
   Future<dynamic> patchWithAuth(url, Map param) async {
     Response response;
     try {
@@ -101,6 +107,7 @@ class HttpRequest {
     }
   }
 
+  // handles post with auth
   Future<dynamic> postWithAuth(url, Map param) async {
     Response response;
     try {

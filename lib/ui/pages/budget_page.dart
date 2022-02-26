@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 
 import '../../utils/constants.dart';
 
+/// Handles listing of budgets
 class BudgetPage extends ConsumerStatefulWidget {
   const BudgetPage({Key? key}) : super(key: key);
 
@@ -18,6 +19,8 @@ class BudgetPage extends ConsumerStatefulWidget {
   _BudgetPageState createState() => _BudgetPageState();
 }
 
+/// A Change notifier provider which provides a budget controller which is used to make
+/// api calls and listen for results while updating the ui accordingly
 final budgetNotifierProvider =
     ChangeNotifierProvider.autoDispose<BudgetController>(
         (ref) => BudgetController());
@@ -26,11 +29,14 @@ class _BudgetPageState extends ConsumerState<BudgetPage> {
   @override
   void initState() {
     super.initState();
+    // An api called was made inside this method so it doesn't happen
+    // while the ui still being updated
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       ref.read(budgetNotifierProvider).getBudgets();
     });
   }
 
+  /// A confirmation dialog that is shown before deleting the item
   Future<void> _deleteDialog(List<Data> data, int index) async {
     return showDialog<void>(
       context: context,
